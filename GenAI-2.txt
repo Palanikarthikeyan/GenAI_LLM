@@ -1,0 +1,345 @@
+Recap
+-------
+N-gram 
+
+|->capture the pattern 
+|->relationships within a sequence of words 
+
+Unigrams (or) (1-grams) - single word (ex: cat dog pen)
+
+Bigrams (or) (2-grams) - Pairs of consecutive words 
+
+Trigrams (or) (3-grams) - Triplets of consecutive of words 
+
+.. 4grams 5grams .. 
+
+	Test code in python
+
+n=1 => |Test||code| |in| |python| # unigrams [Test,code,in,python]
+
+n=2 => |Test||code| |in||python| # bigrams		Vs
+           ---   ===== ====    
+       [  Test code][code in][in python]  	[Test code,code in,in python]
+
+n=3 => |Test||code|in|python| # trigrams
+	-------------
+		------------			Test code in
+
+ngrams(token,n)
+--------|-------
+	|
+
+import nltk
+nltk.download('punkt')
+
+from nltk import ngrams
+from nltk.tokenize import word_tokenize
+
+sentence = "Test code in python"
+
+tokens = word_tokenize(sentence)
+
+# Generate bigrams
+bigrams = list(ngrams(tokens,2))
+print(bigrams)
+
+trigrams =list(ngrams(tokens,3))
+print(trigrams)
+
+#################################################################################################
+
+I am a human
+I am not a soil
+
+II lives in bangalore	
+
+I am leo
+leo i am
+paul i do like
+..
+------------------//data - loaded 
+
+leo _______
+paul i do _______
+... 
+------------------------------------------------------------------------------------------------
+OpenAI 
+ |->chat-gpt
+      ....
+      ....
+App -> Supermarket + AI 
+	 - billing    |<== functional design 
+	 - inventory
+	 - ...
+	 - ... <== customer - today offers 
+	.......<== pA pB x dislikes 
+		..
+		<== next day <== AI - pA pB				
+------------------------------------------------------------
+
+GenAI - App
+|
+Langchain 
+------------------
+Step 1: Data Ingestion 
+	Load - Datasource
+	- pdf,excel,text,log,url,json,csv....
+
+Step 2: Split the data into small chunks/documents
+		
+Step 3: Text Embedding 
+
+Step 4: Vector Store (DB)
+|
+|
+Question -->[ ] ->(prompt) ->LLM ->Answer
+		   ......
+                    
+##################################################################################################
+
+Login - langchain 
+		|
+		Settings ->API 
+
+Goto OpenAI ->https://platform.openai.com
+		|
+		signUp
+		|
+		Generate API Key
+
+
+|
+Create a project Folder <or> login path
+
+|-> create a new file  .env
+		       =====
+			OPENAI_API_KEY=
+			LANGCHAIN_API_KEY=
+			LANGCHAIN_PROJECT=
+
+For windows user ->git-bash terminal -> vi .env{Enter}
+					press i (insert mode - we can type our inputs)
+					OPENAI_API_KEY=""
+					LANGCHAIN_API_KEY=""
+					LANGCHAIN_PROJECT="demo1"
+					press ESC  -> :wq
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Data Ingestion  - Document loaders
+---------------
+
+# Text Loader
+
+pip install langchain_community
+		
+langchain_community
+		|->document_loaders
+			|->TextLoader
+
+
+from langchain_community.document_loaders import TextLoader
+print(TextLoader)
+loader = TextLoader('speech.txt')
+print(loader)
+print(type(loader))
+
+text_documents = loader.load()
+
+print(type(text_documents),len(text_documents))
+
+
+
+#########
+from langchain_community.document_loaders import PyPDFLoader
+
+loader = PyPDFLoader('attention.pdf')
+print(type(loader))
+docs = loader.load()
+print(type(docs),len(docs))
+
+
+url = 'https://www.google.com'
+
+r = requests.get(url)
+if(r.status_code != 200):
+    print(f'{url} download is failed')
+    exit()
+
+if('text/html' in r.headers['Content-Type']):
+    print(f'Input URL {url} is webpage')
+    web_page = r.text
+    print(type(web_page),len(web_page))
+
+
+#######################
+url = 'https://api.github.com/users/hadley/orgs'
+
+r = requests.get(url)
+if(r.status_code != 200):
+    print(f'{url} download is failed')
+    exit()
+
+if('text/html' in r.headers['Content-Type']):
+    print(f'Input URL {url} is webpage')
+    web_page = r.text
+    print(type(web_page),len(web_page))
+elif('application/json' in r.headers['Content-Type']):
+    print(f'Input URL {url} is data response')
+    jd = r.text
+    pd = json.loads(jd) # covnert to python
+###########################
+
+import bs4
+
+gpage = bs4.BeautifulSoup(web_page) # google page
+gpage.title
+gpage.p
+gpage.p['style'] # dict logic d['inputKey'] ->Value/KeyError 
+gpage.p.get('style') # dictname.get('inputKey') ->Value /None
+
+# using find() method
+gpage.find('p')  # gpage.p
+
+# using find_all() method
+gpage.find_all('p')
+gpage.find('a') # same as gpage.a
+gpage.find_all('a')
+
+# To get list of urls
+for var in gpage.find_all('a'):
+    print(var.get('href'))
+#######################################################################################
+
+import re
+re.search('^https','/intl/en/policies/privacy/') # not matched
+
+
+re.search('^https','http://www.google.co.in/services/')
+# not matched
+# start with https
+
+# To filter list of url link - name starts with https
+for var in gpage.find_all('a'):
+    if(re.search('^https',var.get('href'))):
+        print(var.get('href'))
+
+####################################################################################
+
+loader = WebBaseLoader(web_paths=('https://www.google.com','https://www.python.org'))
+loader.load()
+######################################################################################
+
+
+File: ab.py					file: p1.py		 file: p2.py
+=============================			_____________		______________
+app = "flask"					import ab		 from ab import port
+port = 5000					print(ab.port) # OK	  print(port)  # OK
+def f1():					print(port) ->Error	________________
+    print("Test message")			_____________
+============================			
+python ab.py 					SymbolTable
+<empty> - there is no results
+						ab.port | 5000		__main__.port | 5000
+SymbolTable
+
+__main__.app | flask
+-------------|---------
+__main__.port| 5000
+-------------|----------
+__main__.f1  | 0x1234
+-----------------------
+file: pa.py
+----------------------------------------
+app="Flask"
+port=5000
+def f1():
+    print("test message")
+
+if __name__ == '__main__':
+	print(app,port)
+	f1()
+-----------------------------------------
+python pa.py ->OK
+....
+
+python {Enter}
+>>>import pa
+>>>pa.app ->Flask
+-------------------------------------------
+######################################################################################
+from langchain_community.document_loaders import WebBaseLoader
+
+loader = WebBaseLoader(web_path=('https://www.google.com'))
+loader.load()
+
+loader = WebBaseLoader(web_paths=('https://www.google.com','https://www.python.org'))
+loader.load()
+
+
+###################################################################################
+from langchain_community.document_loaders import WikipediaLoader
+loader = WikipediaLoader(query="Generative AI",load_max_docs=2)
+docs = loader.load()
+len(docs)
+#####################################################################################
+from langchain_community.document_loaders import ArxivLoader
+loader = ArxivLoader(query="1706.03762",load_max_docs=2)
+docs = loader.load()
+
+https://python.langchain.com/v0.2/docs/integrations/document_loaders/
+
+##########################################################################################
+
+from langchain_community.document_loaders import ArxivLoader
+loader = ArxivLoader(query="au:<authorName>",load_max_docs=2)
+docs = loader.load()
+
+##########################################################################################
+### Reading a PDF file
+loader = PyPDFLoader('attention.pdf')
+docs = loader.load()
+######################################################## Step 1 is done
+
+text_splitter=RecursiveCharacterTextSplitter(chunk_size=500,chunk_overlap=50)
+final_docs = text_splitter.split_documents(docs)
+
+######################################################### Step 2 is done
+
+
+HTMLtextsplitter
+---------------------
+from langchain_text_splitters import HTMLHeaderTextSplitter
+html_string = '''
+<html>
+<body>
+<div>
+ <h1>msg1</h1>
+ <p>Some sample test</p>
+ <div>
+   <h2> main section </h2>
+   <p>  About Home </p>
+   <h3> dev section </h3>
+   <p> total no counts </p>
+</div>
+<br>
+<p>Outer Text</p>
+</div>
+</body>
+</html>'''
+
+headers_to_split_on = [("h1","Header 1"),("h2","Header 2"),("h3","Header 3")]
+
+html_splitter = HTMLHeaderTextSplitter(headers_to_split_on)
+r = html_splitter.split_text(html_string)
+print(r)
+
+########################################################################################
+Syntax:-
+=========
+html_splitter.split_text_from_url('<inputURL>')
+
+html_splitter = HTMLHeaderTextSplitter(headers_to_split_on)
+r = html_splitter.split_text_from_url('https://www.python.org')
+r[3]					
+
+################################################################################################
