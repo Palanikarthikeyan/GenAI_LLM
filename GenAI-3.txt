@@ -1,0 +1,171 @@
+https://artificialanalysis.ai/
+
+
+langchain - GenAI App framework  - development ; monitor 
+ 
+Organization -> model (Algorithm)
+		.....
+		 |->encode <->decode                      
+------------------------------------------------------------
+OpenAI (organization) - embedding model  -> stores to DB 
+|
+XYZ(organization) - modelA ->stores to DB
+		   ========
+		   LLM - pre-trained models 
+--------------------------------------------------------------
+from langchain_community.embeddings import OllamaEmbeddings
+
+embeddings = OllamaEmbeddings(model="gemma:2b")
+
+#text = "Hello world example"
+
+#embeddings.embed_query(text)
+
+
+doc = embeddings.embed_documents(["abc is the first word","xyz is the last word"])
+
+embeddings.embed_query("what is the last word") ->[101010] / [] ->not matched 
+							|
+							|->matched_query results
+
+
+Facebook AI Similarity Search(Faiss) - vector store
+........................................................
+
+
+
+################################################################################
+https://www.pinecone.io/learn/series/faiss/faiss-tutorial/
+################################################################################
+
+1. Load the data
+2. Split - chunk
+3. Embedding 
+4. Stores to vectorDB
+|
+5. Save to local m/c 
+|
+|
+6. Retriever
+|
+7. Query
+|
+8. search - similarity_search(Query) ->text doc 
+
+
+
+from langchain_community.document_loaders import TextLoader
+from langchain_community.vectorstores import FAISS
+from langchain_community.embeddings import OllamaEmbeddings
+from langchain_text_splitters import CharacterTextSplitter
+
+loader = TextLoader('speech.txt')
+documents = loader.load()
+text_splitter = CharacterTextSplitter(chunk_size=1000,chunk_overlap=30)
+docs = text_splitter.split_documents(documents)
+
+embeddings = OllamaEmbeddings(model="gemma:2b")
+db = FAISS.from_documents(docs,embeddings)
+print(db)
+
+
+# create a query
+query = "How to describe the war?"
+
+docs = db.similarity_search(query)
+print(len(docs))
+print(docs[0]))
+print(docs[0].page_content)
+
+
+# Retriever 
+# ----------
+# we can also convert the vectorstore into a Retriever class
+
+retriever = db.as_retriever() # convert our vectorDB as retriever
+
+docs=retriever.invoke(query)
+docs[0].page_content
+
+
+# Simiarity Search with score
+#    
+docs_and_score = db.similarity_search_with_score(query)
+
+docs_and_score 
+
+[(Document(page_content='',metdata={'source':'speech.xt'}),1234.4), ..
+
+
+
+embedding_vector = embeddings.embed_query(query)
+# vectors
+
+docs_score = db.similarity_seach_by_vector(embedding_vector)
+print(docs_score)
+
+## Save 
+db.save_local("faiss_index")
+
+#####
+
+new_db = FAISS.load_local("faiss_index",embeddings,allow_dangerous_deserialization=True)
+
+docs = new_db.similarity_search(query)
+print(docs)
+
+################################################################################################
+
+  DB
+  ---------
+  place is cityA
+  pen color is green
+  tom heigh is 150cm
+  --------------
+	|
+	[ LLM ]
+	|
+	which place
+	what color
+	what is the height
+	|
+	How to describe spark dataframe ? -> not suitable results
+
+ prompt|llm <= chain
+ ^^^^^
+  ?
+ output_parser
+
+#############################################################################
+
+https://huggingface.co
+|
+signup
+|
+After signup - create own API keys
+
+Go to settings ->Access Token ->create new token -> [.] read  allow 
+|
+copy this token and update to .env file
+|
+|
+vi .env file 
+|
+HF_TOKEN="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"
+:wq 
+|
+|
+# Embedding Techniques using HuggingFace
+import os
+from dotenv import load_dotenv
+load_dotenv()
+
+
+
+
+
+
+
+
+
+
