@@ -1,0 +1,372 @@
+from langchain_core.prompts import PromptTemplate
+print(PromptTemplate)
+
+PromptTemplate.from_template("I likes to read this {book} ")
+
+promt2_obj = PromptTemplate.from_template("I likes to read this {book} ")
+promt2_obj.format(book="python")
+
+promt2_obj.format(book="GenAI")
+
+promt3_obj = PromptTemplate.from_template("My self {name} i am from {place} iam belongs to {dept}")
+promt3_obj.format(name="leo",place="pune",dept="sales")
+
+promt4_obj = (PromptTemplate.from_template("Tell me about {topic}")+", yes its nice hear"+"\n thanks {name} about your talk")
+
+promt4_obj.format(topic="water",name="Paul")
+
+print(promt4_obj.format(topic="water",name="Paul"))
+
+---------------------------------------------
+
+example:
+
+name = "Karthik"
+print(f"Hello {name}")
+|
+name = input("Enter your name:")
+print(f"Hello {name}")
+|
+in html                                                                ____________
+Enter your name:<input_type="text" name="n1" ...>  => Enter your name:|___________|
+^^^^^^^^^^^^^^^^					............
+------------------------------------------------------------------------------------------------
+
+import os
+
+from dotenv import load_dotenv
+from langchain_community.llms import Ollama
+from langchain_core.prompts import ChatPromptTemplate
+from langchain_core.output_parsers import StrOutputParser
+
+load_dotenv()
+
+# Langsmith Tracking
+os.environ["LANGCHAIN_API_KEY"]=os.getenv("LANGCHAIN_API_KEY")
+os.environ["LANGCHAIN_TRACING_V2"]="true"
+os.environ["LANGCHAIN_PROJECT"]=os.getenv("LANGCHAIN_PROJECT")
+
+# prompt template
+prompt = ChatPromptTemplate.from_messages(
+    [ ("system","you are a helpful AI assistant,Please respond to the Q asked"),
+     ("user","Question:{question}")
+    ]
+)
+
+## Ollama model
+llm = Ollama(model = "gemma:2b")
+output = StrOutputParser()
+chain = prompt|llm|output
+
+chain.invoke({"question":"what is genAI"})
+
+####################################################################################
+
+output_obj=StrOutputParser()
+
+docs|output_obj -> <Result_only> # there is no metadata 
+
+prompt|llm|output_obj
+     --------------------//chain
+
+####################################################################################
+
+Streamlit
+----------
+|->streamlit is a free and opensource framework
+|->build ML and Datascience web app
+  ex: ML Algorithm 
+	 -> we can run ML algorithm in streamlit
+
+|-> It is a python-based lib 
+
+|-> we can use all ml libs -> numpy pandas matplotlib seaboarn,keras,pytorch,genAI models
+
+
+|-> Goto commandline terminal => pip install streamlit
+				
+|->web app - port:8501 
+
+How to run streamlit ?
+
+streamlit run pythonCode (or) python -m streamlit run <pythonCode>
+					
+
+create folder/
+		p1.py - 
+		p2.py -
+		p3.py 
+		|
+		....
+		
+import streamlit as st
+st.write() - display message 
+st.title() - set the title
+st.header() - set the header ...
+
+
+import streamlit as st
+
+# Title 
+st.title("Welcome to Streamlit")
+
+
+# display message
+st.write("This is test message")
+st.write("This simple easy frame work")
+---------------------------------------------------------
+import pandas 
+
+df = pd.DataFrame({"K1":[10,20,30,40],"K2":[100,200,300,400]})
+
+st.write("sample data frame from pandas")
+
+# dispaly the dataframe
+st.write(df)
+
+df1 = pd.DataFrame(np.random.randn(20,3),columns=['A','B','C'])
+st.line_chart(df1)
+
+-----------------------------------------------------------------
+
+import streamlit as st
+import pandas as pd
+import numpy as np
+
+# Title 
+st.title("Welcome to Streamlit")
+
+
+# display message
+st.write("This is test message")
+st.write("This simple easy frame work")
+
+df = pd.DataFrame({"K1":[10,20,30,40],"K2":[100,200,300,400]})
+st.write("sample data frame from pandas")
+# dispaly the dataframe
+st.write(df)
+
+df1 = pd.DataFrame(np.random.randn(20,3),columns=['A','B','C'])
+#st.line_chart(df1)
+
+
+-------------------------------------------------------------------------------
+<input_variable>=st.text_input("prompt message:")
+
+st.write(f"Hello{<input_variable>}")
+
+
+
+
+import streamlit as st
+
+st.title("Welcome to streamlit")
+
+#name = st.text_input("Enter your name:")
+#st.write(f"Hello {name}")
+
+name = st.text_input("Enter your name:")
+age = st.slider("Select your age:",15,100,25)
+if name:
+    st.write(f"Hello {name}")
+
+st.write(f"Hello{name} your age is:{age}")
+
+
+import streamlit as st
+import pandas as pd
+
+st.title("Welcome to streamlit")
+
+#name = st.text_input("Enter your name:")
+#st.write(f"Hello {name}")
+
+name = st.text_input("Enter your name:")
+age = st.slider("Select your age:",15,100,25)
+if name:
+    #st.write(f"Hello {name}")
+    st.write(f"Hello{name} your age is:{age}")
+
+
+data = {}
+data['Name']=['Ram','Tom','Leo']
+data['Dept']=['sales','HR','QA']
+data['City']=['City1','City2','City3']
+
+df = st.selectbox("Choose your data:",data)
+df = pd.DataFrame(data)
+st.write(df)
+
+uploaded_file = st.file_uploader("Choose your input file:",type="csv")
+if uploaded_file is not None:
+    df=pd.read_csv(uploaded_file)
+    st.write(df)
+
+
+
+#####################################################################################
+
+import streamlit as st
+
+st.checkbox('Yes')
+st.button('Click Me')
+st.radio('Select your option:',['Yes','No'])
+
+st.selectbox('Select your model:',['model1','model2','model3'])
+st.multiselect('Choose a planet:',['Jupiter','Mars','Neptune'])
+
+st.slider('Pick a number:',0,100)
+st.select_slider('Pick a mark:',['Bad','Good','Excellent'])
+
+#####################################################################################
+
+add new features to an existing code - decorator - design model 
+....
+streamlit - @st.cache => @st.cache_data
+	    .........    ----------------
+
+
+ML Code
+--------
+import ml libraries 
+
+load the dataset
+
+split the data into training and test sets 
+
+create a <MLAlogrithm> instance (ex: LinearRegression() ; RandomForestClassifier() ...)
+
+Train the model
+
+Make prediction
+
+Evaluate the model
+-------------------------
+
+https://github.com/Palanikarthikeyan/GenAI_LLM/blob/main/Streamlit-Examples.zip
+#######################################################################################################
+
+
+import os
+from dotenv import load_dotenv
+load_dotenv()
+from langchain_community.llms import Ollama
+from langchain_core.prompts import ChatPromptTemplate
+from langchain_core.output_parsers import StrOutputParser
+
+# Langsmith Tracking
+os.environ["LANGCHAIN_API_KEY"]=os.getenv("LANGCHAIN_API_KEY")
+os.environ["LANGCHAIN_TRACING_V2"]="true"
+os.environ["LANGCHAIN_PROJECT"]=os.getenv("LANGCHAIN_PROJECT")
+
+# prompt template
+
+prompt = ChatPromptTemplate.from_messages(
+    [ ("system","you are a helpful AI assistant,Please respond to the Q asked"),
+     ("user","Question:{question}")
+    ]
+)
+
+## Ollama model
+llm = Ollama(model = "gemma:2b")
+output = StrOutputParser()
+chain = prompt|llm|output
+#########################################################################################################
+
+groq - fast Api in AI
+|
+Tensor Streaming Processor - architecture 
+Single-Core and Mutli-Core
+
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+Web Framework 
+- flask 
+   |->micro framework
+   |->url binding 
+   |->MVT 
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+
+# To understand General API 
+# To understand General webframework - urlmapping -> / /aboutus 
+|
+# To understand groq - Webframework - LPU
+
+# customeAPI + llm + groq
+	|	|     ?
+    	|	....
+	|	....
+	|
+	/
+	/path
+	/...
+	/...
+
+sign in groq
+|
+get API token
+|
+update to .env file
+	|
+	GROQ_API_KEY=""
+	
+|
+import all langchain_core 
+|
+import langchain_groq
+|
+create a model - using groq
+|
+create a prompt
+|
+create chain
+|
+App definition - use any custom  framework
+|
+|->Add chain routes
+|
+run
+-----------------------
+ |->[serverCode] - started - 127.0.0.1:8000/chain/invoke   -client - do post
+								|
+								|->requests,streamlit # user Interface 
+	|
+	| ---------------------<--------------------------------|
+
+	
+fastAPI - webframe work
+   
+    |->FastAPI
+	
+GROQ_API_KEY="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"
+
+
+# streamlit 
+# python -m streamlit run p1.py 
+
+
+python fastAPI_server.py
+http://127.0.0.1:8000/chain/playground/
+
+
+#####################################################################################################
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
