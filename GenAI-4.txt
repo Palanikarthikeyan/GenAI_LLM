@@ -337,7 +337,7 @@ fastAPI - webframe work
    
     |->FastAPI
 	
-GROQ_API_KEY="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"
+GROQ_API_KEY=" "
 
 
 # streamlit 
