@@ -1,0 +1,225 @@
+Reference URL
+----------------
+https://github.com/y-pred/Langchain/blob/main/Langchain%202.0/RAG_Conversational_Chatbot.ipynb
+
+https://console.groq.com/docs/models
+
+https://neptune.ai/blog/how-to-compare-machine-learning-models-and-algorithms
+
+https://medium.com/@sthanikamsanthosh1994/understanding-bleu-and-rouge-score-for-nlp-evaluation-1ab334ecadcb
+
+https://www.geeksforgeeks.org/understanding-bleu-and-rouge-score-for-nlp-evaluation/
+
+https://www.elastic.co/search-labs/blog/evaluating-rag-metrics
+
+https://dassum.medium.com/fine-tune-large-language-model-llm-on-a-custom-dataset-with-qlora-fb60abdeba07#:~:text=Fine%2Dtuning%20methods,its%20proficiency%20in%20specific%20tasks.
+
+https://huggingface.co/transformers/v3.2.0/custom_datasets.html
+
+https://www.datacamp.com/tutorial/fine-tuning-large-language-models
+
+https://www.datacamp.com/tutorial/how-transformers-work
+
+https://hevodata.com/learn/jira-to-oracle/
+
+https://docs.llamaindex.ai/en/stable/examples/embeddings/oracleai/
+##########################
+
+data 
+|
+SQL 
+|
+Finetuning 
+|
+Transformer 
+
+
+os.environ['HF_TOKEN'] = os.getenv('HF_TOKEN') 
+from langchain_huggingface import HuggingFaceEmbeddings
+embeddings = HuggingFaceEmbeddings(model_name='all-MiniLM-L6-v2')
+embeddings
+
+from langchain_community.document_loaders import WebBaseLoader
+from langchain_core.prompts import ChatPromptTemplate
+from langchain_text_splitters import RecursiveCharacterTextSplitter
+from langchain_community.vectorstores import Chroma
+from langchain.chains import create_retrieval_chain
+from langchain.chains.combine_documents import create_stuff_documents_chain
+
+import bs4
+loader=WebBaseLoader(web_path=('https://lilianweng.github.io/posts/2023-06-23-agent/'),bs_kwargs=dict(parse_only=bs4.SoupStrainer(class_=("post-title","post-content","post-header")),))
+docs = loader.load()
+
+text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000,chunk_overlap=200)
+splits = text_splitter.split_documents(docs)
+vectorstore = Chroma.from_documents(documents=splits,embedding=embeddings)
+retriver = vectorstore.as_retriever()
+retriever
+
+## Prompt Template
+system_prompt = ("You are as assistant for question-answering tasks"
+                 "\n\n"
+                 "{context}")
+prompt = ChatPromptTemplate.from_messages([("system",system_prompt),("human","{input}"),])
+
+qa_chain = create_stuff_documents_chain(llm,prompt)
+rag_chain = create_retrieval_chain(retriver,qa_chain)
+
+response = rag_chain.invoke({"input":"what is Self-Reflection"})
+#print(response)
+response['answer']
+
+response = rag_chain.invoke({"input":"how do we move fast"})
+response['answer']
+#print(response)
+
+## Adding Chat History
+from langchain.chains import create_history_aware_retriever
+from langchain_core.prompts import MessagesPlaceholder
+
+q_system_prompt = ( "Given a chat history and latest user question"
+                   "which might reference context in the chat history"
+                   "without the chat history.Do NOT answer the question" )
+q_prompt = ChatPromptTemplate.from_messages( 
+    [ ("system",q_system_prompt),MessagesPlaceholder("chat_history"),
+("human","{input}"),])
+
+
+
+requests.get('https://www.google.com')
+		
+requests.get('https://ou-attenance').status_code != 200 ->True
+				|
+requests.get('https://ou-attenance',auth=(<token>,)).status_code != 200 ->True
+
+...
+webaseloader 
+--------------------------------------------------------------------------
+pdfloader ->p1.pdf
+   Vs
+Folder/p1.pdf ... p100.pdf 
+       ----------------------
+ |
+ |
+PyPDFDirectoryLoader
+.....................
+
+load the document ->chunk ->embedding ->store to vectorDB
+ p1.pdf			..	..	...
+ p2.pdf			..	..	..
+----------------------------------------------------//create a function
+
+
+
+streamlit
+ -> Query => user_prompt = st.text_input(".......")
+		
+		st.write(response['answer'])
+
+########################################################################################################
+
+[ function 1 ]    [  other block ]
+	|_______________|
+	  variable
+	  - ....
+	  - callback states
+	  - session state
+
+if 'K1' not in st.session_state:
+	st.session_state['K1']=Value # (or) st.session_state.K1 = Value
+	.............................. //adding data to an existing dict
+
+st.session_state.key
+
+Q1. what is transformer
+
+ 
+##########################################################################################################
+
+SQL
+----
+ Agent ->executor
+  ||
+ langchain.agents.agent_tooldkits 
+			|---------->SQLDatabaseToolkit 
+
+
+[ remoteNode ]			[monitor-local ...]
+					....
+   |- exporter
+	|->executor(R+)
+		|
+   |----------------------------------->
+
+DataBase
+   |----- connection,llm
+
+toolkit
+ |-><connection>,llm
+ |
+Agent
+ |->toolkit
+ |->...
+
+[0.....1000 ] ->  [0....255]
+
+        xmax - xmin          1000 - 0
+scale = ----------------  =  -----------
+          qmax - qmin	       255 - 0 
+
+			  = 1000/255 
+			  = 3.92 
+
+round(120/3.92) = .....
+
+LORA
+QLURA
+
+
+BLEU score - measurement 
+ - n grams
+ - W
+ - penalty
+
+
+
+>>> from nltk.translate.bleu_score import sentence_bleu
+
+>>> reference = [['the', 'cat', 'is', 'on', 'the', 'mat']]
+
+>>> candidate = ['the', 'cat', 'sits', 'on', 'the', 'mat']
+
+>>> score = sentence_bleu(reference, candidate)
+
+>>> print(score)
+7.262123179505913e-78
+
+ROUGE  - metric 
+- evaluate summarization tasks 
+
+
+
+
+
+text -> the cat is on bed 
+	[] [] [] [] [] 
+
+  [Encode] <-->[Decoder]
+
+
+Context Vector
+
+	  [Feed forward]
+	   |	
+	  [  ] z  - context vector 
+	  [self-attention]
+	---------------------
+	the [ ] V1
+
+Query
+key
+value
+
+#####################################################################################################
+
+
